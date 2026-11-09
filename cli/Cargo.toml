@@ -1,0 +1,18 @@
+[package]
+name = "screentime-cli"
+description = "screentime command line + windowless tracker"
+version.workspace = true
+edition.workspace = true
+license.workspace = true
+
+[[bin]]
+name = "screentime"
+path = "src/main.rs"
+
+[[bin]]
+name = "screentime-tracker"
+path = "src/bin/tracker.rs"
+
+[dependencies]
+screentime-core.workspace = true
+chrono.workspace = true
