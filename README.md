@@ -83,7 +83,7 @@ To run it anyway, click **More info**, then **Run anyway**. You only need to do 
 
 If you want to check the file first:
 
-- VirusTotal scan: [VIRUSTOTAL_LINK](VIRUSTOTAL_LINK)
+- VirusTotal scan of 1.0.1: [0 of 71 engines flag it](https://www.virustotal.com/gui/file/b9e24ebd0a2b6ddcd689ed4cc826ba2a8bd71b813947e0dfaf1c5ea23804db11)
 - The SHA256 hash of each release file is in the [release notes](https://github.com/StarKnightt/screentime/releases/latest). In PowerShell: `Get-FileHash .\Screentime.exe`
 - Or [build it from source](#build-from-source).
 
