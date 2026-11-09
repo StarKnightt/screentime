@@ -13,7 +13,7 @@ powershell -File store\build.ps1                         # unsigned, for Partner
 powershell -File store\build.ps1 -TestCert <thumbprint>  # plus a test-signed copy to install locally
 ```
 
-Output: `store\out\Screentime_1.0.0.0_x64.msix` (unsigned; Microsoft signs it after
+Output: `store\out\Screentime_1.0.1.0_x64.msix` (unsigned; Microsoft signs it after
 certification). `store\out\` is not committed.
 
 What the script does: builds `screentime-app.exe` (shipped as `Screentime.exe`) and

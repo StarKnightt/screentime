@@ -102,6 +102,6 @@ Windows 11, 64-bit (x64). No special hardware.
 
 ## Facts behind the numbers
 
-- Under 10 MB of memory: the one-file app's tracker measures 9.6 MB working set (README); the Store build's tracker is measured in the packaged test install (store/README.md). Both are under 10 MB; the listing gives no exact figure.
+- Under 10 MB of memory: the background tracker measured under 10 MB working set in both the one-file app and the packaged test install (store/README.md). The listing gives no exact figure.
 - ~0% CPU: 0.001% of total CPU over two minutes of normal use on Windows 11.
 - No network: the app declares no network capability and contains no networking code.

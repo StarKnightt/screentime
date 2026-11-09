@@ -3,8 +3,8 @@
 #   powershell -File store\build.ps1                       unsigned .msix for Partner Center
 #   powershell -File store\build.ps1 -TestCert <thumbprint> also a test-signed copy for a local install
 #
-# Output: store\out\Screentime_1.0.0.0_x64.msix (unsigned; Microsoft signs it on submission)
-#         store\out\test\Screentime_1.0.0.0_x64.test.msix (only with -TestCert)
+# Output: store\out\Screentime_1.0.1.0_x64.msix (unsigned; Microsoft signs it on submission)
+#         store\out\test\Screentime_1.0.1.0_x64.test.msix (only with -TestCert)
 # Needs the Windows 10/11 SDK (MakeAppx, MakePri, SignTool) and Rust.
 param([string]$TestCert = "")
 $ErrorActionPreference = "Stop"

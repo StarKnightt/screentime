@@ -1,7 +1,7 @@
 # Partner Center: submit Screentime for Windows
 
 Everything to paste is in this folder: `listing.md`, `age-rating.md`, `runfulltrust.md`, `screenshots/`.
-The file to upload is `store/out/Screentime_1.0.0.0_x64.msix` (unsigned; Microsoft signs it).
+The file to upload is `store/out/Screentime_1.0.1.0_x64.msix` (unsigned; Microsoft signs it).
 
 1. Go to https://partner.microsoft.com/dashboard > **Apps and games** > **Screentime for Windows** > **Start your submission**.
 2. **Pricing and availability**
@@ -21,8 +21,8 @@ The file to upload is `store/out/Screentime_1.0.0.0_x64.msix` (unsigned; Microso
    - Save.
 4. **Age ratings**: Start the IARC questionnaire and answer it from `age-rating.md` (category "All other app types", every content question No). Save the rating.
 5. **Packages**
-   - Drag in `store/out/Screentime_1.0.0.0_x64.msix`.
-   - Wait for the package to validate. Check it shows: Version 1.0.0.0, Architecture x64, device family Windows.Desktop, minimum version 10.0.22000.0, and capability runFullTrust.
+   - Drag in `store/out/Screentime_1.0.1.0_x64.msix`.
+   - Wait for the package to validate. Check it shows: Version 1.0.1.0, Architecture x64, device family Windows.Desktop, minimum version 10.0.22000.0, and capability runFullTrust.
    - Device family availability: **Windows 10/11 Desktop** checked; everything else unchecked.
    - Save.
 6. **Store listings** > **English (United States)**
