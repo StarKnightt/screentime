@@ -12,7 +12,7 @@ The file to upload is `store/out/Screentime_1.0.1.0_x64.msix` (unsigned; Microso
    - Save.
 3. **Properties**
    - Category: **Productivity**. Subcategory: none.
-   - Privacy policy URL: `https://github.com/StarKnightt/screentime/blob/store/PRIVACY.md`
+   - Privacy policy URL: `https://github.com/StarKnightt/screentime/blob/main/PRIVACY.md`
    - Website: `https://github.com/StarKnightt/screentime`
    - Support contact info: `https://github.com/StarKnightt/screentime/issues`
    - "Does this product access, collect, or transmit personal information?": **Yes** (it stores app usage on the PC; the privacy policy explains it stays there).

@@ -77,8 +77,7 @@ https://github.com/StarKnightt/screentime/issues
 
 ## Privacy policy URL
 
-https://github.com/StarKnightt/screentime/blob/store/PRIVACY.md
-(After the store branch is merged, https://github.com/StarKnightt/screentime/blob/main/PRIVACY.md also works; you can update the field then.)
+https://github.com/StarKnightt/screentime/blob/main/PRIVACY.md
 
 ## Screenshots (upload in this order)
 
