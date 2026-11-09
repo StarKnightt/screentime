@@ -42,11 +42,14 @@ pub struct Config {
     /// Tracking paused by the user.
     pub paused: bool,
     pub theme: ThemePref,
+    /// The first-run "start at login?" question is still unanswered. Only a
+    /// fresh install sets it; an existing config without the key never asks.
+    pub ask_startup: bool,
 }
 
 impl Default for Config {
     fn default() -> Self {
-        Self { idle_minutes: 5, paused: false, theme: ThemePref::System }
+        Self { idle_minutes: 5, paused: false, theme: ThemePref::System, ask_startup: false }
     }
 }
 
@@ -78,6 +81,7 @@ impl Config {
                     }
                 }
                 "paused" => c.paused = matches!(v, "true" | "1" | "yes"),
+                "ask_startup" => c.ask_startup = matches!(v, "true" | "1" | "yes"),
                 "theme" => {
                     c.theme = ThemePref::ALL.into_iter().find(|t| t.as_str() == v).unwrap_or_default()
                 }
@@ -90,10 +94,11 @@ impl Config {
     pub fn to_text(&self) -> String {
         format!(
             "# Screentime settings. Edited by the app; safe to edit by hand.\n\
-             idle_minutes = {}\npaused = {}\ntheme = {}\n",
+             idle_minutes = {}\npaused = {}\ntheme = {}\n{}",
             self.idle_minutes,
             self.paused,
-            self.theme.as_str()
+            self.theme.as_str(),
+            if self.ask_startup { "ask_startup = true\n" } else { "" }
         )
     }
 
@@ -119,8 +124,10 @@ mod tests {
 
     #[test]
     fn round_trips() {
-        let c = Config { idle_minutes: 10, paused: true, theme: ThemePref::Dark };
-        assert_eq!(Config::parse(&c.to_text()), c);
+        for ask_startup in [false, true] {
+            let c = Config { idle_minutes: 10, paused: true, theme: ThemePref::Dark, ask_startup };
+            assert_eq!(Config::parse(&c.to_text()), c);
+        }
     }
 
     #[test]

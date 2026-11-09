@@ -865,8 +865,6 @@ dependencies = [
 [[package]]
 name = "iced_graphics"
 version = "0.14.0"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "234ca1c2cec4155055f68fa5fad1b5242c496ac8238d80a259bca382fb44a102"
 dependencies = [
  "bitflags 2.13.2",
  "bytemuck",
@@ -2031,7 +2029,7 @@ checksum = "94143f37725109f92c262ed2cf5e59bce7498c01bcc1502d7b9afe439a4e9f49"
 
 [[package]]
 name = "screentime-app"
-version = "1.0.0"
+version = "1.0.1"
 dependencies = [
  "chrono",
  "embed-resource",
@@ -2042,7 +2040,7 @@ dependencies = [
 
 [[package]]
 name = "screentime-cli"
-version = "1.0.0"
+version = "1.0.1"
 dependencies = [
  "chrono",
  "screentime-core",
@@ -2050,7 +2048,7 @@ dependencies = [
 
 [[package]]
 name = "screentime-core"
-version = "1.0.0"
+version = "1.0.1"
 dependencies = [
  "chrono",
  "rusqlite",

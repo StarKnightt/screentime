@@ -128,8 +128,10 @@ impl Source {
     pub fn load(&mut self) -> Snapshot {
         let today = today();
         let now = now_ts();
-        let (t0, _) = day_range(today);
+        let (t0, t1) = day_range(today);
         let mut snap = Snapshot { today, now_offset: now - t0, ..Default::default() };
+        // Before the first data (a fresh install) the dial still spans the day.
+        snap.day.length = t1 - t0;
         let result = (|| -> Result<(), String> {
             let Some(store) = self.store()? else { return Ok(()) };
             snap.has_db = true;

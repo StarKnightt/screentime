@@ -190,6 +190,21 @@ pub fn outline(c: Colors) -> impl Fn(&Theme, button::Status) -> button::Style {
     }
 }
 
+/// Filled ink button for the one choice that matters on a card.
+pub fn solid(c: Colors) -> impl Fn(&Theme, button::Status) -> button::Style {
+    move |_, status| button::Style {
+        background: Some(Background::Color(match status {
+            button::Status::Hovered => alpha(c.ink, 0.86),
+            button::Status::Pressed => alpha(c.ink, 0.74),
+            _ => c.ink,
+        })),
+        text_color: c.bg,
+        border: border::rounded(8.0),
+        shadow: Shadow::default(),
+        snap: true,
+    }
+}
+
 pub fn toggle(c: Colors) -> impl Fn(&Theme, toggler::Status) -> toggler::Style {
     move |_, status| {
         let (on, hovered) = match status {

@@ -13,7 +13,7 @@ One file, no installer, free. For 64-bit Windows 11 (see [Supported Windows vers
 ## Install
 
 1. Download `Screentime.exe` and put it somewhere you will keep it, for example a folder in Documents.
-2. Double-click it. The window opens and tracking starts. Start at login is turned on for you.
+2. Double-click it. The window opens and tracking starts. Screentime asks once whether to start when you sign in; it only does if you say yes, and you can change it any time in Settings.
 
 The exe is not code signed, so Windows may show "Windows protected your PC". Click **More info**, then **Run anyway**. See [Windows says it's unsafe?](#windows-says-its-unsafe)
 
@@ -26,6 +26,7 @@ Closing the window keeps Screentime in the tray. Click the tray icon to open it 
 - **Pick an app, see exactly when.** Click an app and the dial shows only its slices.
 - **Week view.** The last seven days side by side, plus your most used apps.
 - **Counts only real use.** Idle time is subtracted (you choose after how long), locked screens are not counted, and pop-ups and hidden windows are ignored.
+- **Smooth scrolling** with a mouse wheel or touchpad.
 - **Pause** from the tray or Settings, **light and dark** themes, and **export** of every session to CSV or JSON.
 
 ![Every app, its own colour](docs/images/apps.jpg)

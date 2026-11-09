@@ -44,6 +44,15 @@ const DESKTOP_READOBJECTS: u32 = 0x0001;
 const RUN_KEY: &str = r"Software\Microsoft\Windows\CurrentVersion\Run";
 const RUN_VALUE: &str = "Screentime";
 
+/// The Run value name. `SCREENTIME_TEST_ID` gives a test run its own value,
+/// so testing the first-run flow never reads or writes the real entry.
+fn run_value() -> String {
+    match std::env::var("SCREENTIME_TEST_ID") {
+        Ok(id) if !id.is_empty() => format!("{RUN_VALUE}.test.{id}"),
+        _ => RUN_VALUE.to_string(),
+    }
+}
+
 pub(crate) fn wide(s: impl AsRef<std::ffi::OsStr>) -> Vec<u16> {
     s.as_ref().encode_wide().chain(Some(0)).collect()
 }
@@ -433,7 +442,7 @@ pub fn set_startup(command: &str) -> std::io::Result<()> {
         RegSetKeyValueW(
             HKEY_CURRENT_USER,
             wide(RUN_KEY).as_ptr(),
-            wide(RUN_VALUE).as_ptr(),
+            wide(run_value()).as_ptr(),
             REG_SZ,
             data.as_ptr() as *const c_void,
             (data.len() * 2) as u32,
@@ -445,7 +454,7 @@ pub fn set_startup(command: &str) -> std::io::Result<()> {
 /// Remove the login entry. Succeeds if it was not there.
 pub fn clear_startup() -> std::io::Result<()> {
     let rc = unsafe {
-        RegDeleteKeyValueW(HKEY_CURRENT_USER, wide(RUN_KEY).as_ptr(), wide(RUN_VALUE).as_ptr())
+        RegDeleteKeyValueW(HKEY_CURRENT_USER, wide(RUN_KEY).as_ptr(), wide(run_value()).as_ptr())
     };
     const ERROR_FILE_NOT_FOUND: u32 = 2;
     if rc == ERROR_FILE_NOT_FOUND {
@@ -462,7 +471,7 @@ pub fn get_startup() -> Option<String> {
         let rc = RegGetValueW(
             HKEY_CURRENT_USER,
             wide(RUN_KEY).as_ptr(),
-            wide(RUN_VALUE).as_ptr(),
+            wide(run_value()).as_ptr(),
             RRF_RT_REG_SZ,
             null_mut(),
             buf.as_mut_ptr() as *mut c_void,

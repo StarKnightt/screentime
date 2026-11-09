@@ -3,7 +3,7 @@ resolver = "2"
 members = ["core", "cli", "gui"]
 
 [workspace.package]
-version = "1.0.0"
+version = "1.0.1"
 edition = "2021"
 license = "MIT"
 
@@ -19,3 +19,7 @@ lto = true
 codegen-units = 1
 panic = "abort"
 strip = true
+
+[patch.crates-io]
+# Damage grouping tweak for smooth scrolling on the software renderer (see vendor/iced_graphics/src/damage.rs).
+iced_graphics = { path = "vendor/iced_graphics" }

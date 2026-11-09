@@ -92,7 +92,7 @@ pub fn events() -> impl Stream<Item = External> {
         let t = tx.clone();
         win_ui::watch_theme(move || send(&t, External::ThemeChanged));
         // A second launch fires this event instead of opening another app.
-        if let Some(show) = win::NamedEvent::create(win::names::APP_SHOW) {
+        if let Some(show) = win::NamedEvent::create(&crate::instance_name(win::names::APP_SHOW)) {
             let t = tx.clone();
             std::thread::spawn(move || {
                 while show.wait(u32::MAX) {

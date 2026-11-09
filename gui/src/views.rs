@@ -34,6 +34,8 @@ pub fn view(app: &App) -> El<'_> {
     let content = scrollable(container(body).padding(Padding { top: 8.0, right: side, bottom: MARGIN, left: side }))
         .style(style::scroll(c))
         .height(Fill);
+    // Wheel steps glide instead of jumping (not when Windows animations are off).
+    let content = crate::smooth::smooth(content, app.motion());
     container(column![header(app, c), content]).style(style::window(c)).width(Fill).height(Fill).into()
 }
 
@@ -151,6 +153,29 @@ fn app_rows<'a>(app: &'a App, rows: &Rows, focusable: bool, c: Colors) -> El<'a>
     col.into()
 }
 
+/// The first-run question. Start at login is never turned on without it.
+fn startup_prompt<'a>(c: Colors) -> El<'a> {
+    container(
+        column![
+            column![
+                text("Start Screentime when you sign in?").size(size::BODY).font(MEDIUM).color(c.ink),
+                text("It needs to run to track your whole day.").size(size::CAPTION).color(c.ink2),
+            ]
+            .spacing(3),
+            row![
+                button(text("Yes, start at login").size(size::CAPTION).font(MEDIUM)).padding([7, 12]).style(style::solid(c)).on_press(Msg::AnswerStartup(true)),
+                button(text("Not now").size(size::CAPTION).font(MEDIUM)).padding([7, 12]).style(style::outline(c)).on_press(Msg::AnswerStartup(false)),
+            ]
+            .spacing(8),
+        ]
+        .spacing(12),
+    )
+    .padding([14, 14])
+    .width(Fill)
+    .style(style::fill(c.surface, 10.0))
+    .into()
+}
+
 fn banner<'a>(app: &App, c: Colors) -> Option<El<'a>> {
     let (msg, action, label) = if !app.tracker_running {
         ("Screentime isn't recording right now.", Msg::StartTracker, "Start tracking")
@@ -198,6 +223,9 @@ fn dial_parts(app: &App, day: &DayReport, rows: &Rows, c: Colors) -> (Vec<Piece>
 fn today<'a>(app: &'a App, c: Colors) -> El<'a> {
     let s = &app.snap;
     let mut col = Column::new();
+    if app.config.ask_startup {
+        col = col.push(inset(startup_prompt(c))).push(space().height(GAP));
+    }
     if let Some(b) = banner(app, c) {
         col = col.push(inset(b)).push(space().height(GAP));
     }

@@ -18,7 +18,7 @@ chrono.workspace = true
 # 195 MB / 244 MB, equally crisp at 125/150/200 %. A tray app that is open all
 # day should not hold ~200 MB or wake the discrete GPU to draw a few bars, and
 # it only repaints on input or every 30 s. Re-enable "wgpu" to compare again.
-iced = { version = "0.14", default-features = false, features = ["tiny-skia", "crisp", "thread-pool", "canvas", "image-without-codecs"] }
+iced = { version = "0.14", default-features = false, features = ["tiny-skia", "crisp", "thread-pool", "canvas", "image-without-codecs", "advanced"] }
 tray-icon = { version = "0.26", default-features = false }
 
 [build-dependencies]

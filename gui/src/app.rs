@@ -47,6 +47,8 @@ pub enum Msg {
     Focus(Option<String>),
     Key(keyboard::Event),
     SetStartup(bool),
+    /// The first-run question: "Yes, start at login" or "Not now".
+    AnswerStartup(bool),
     SetPaused(bool),
     IdleStep(i32),
     SetTheme(ThemePref),
@@ -155,17 +157,19 @@ fn start_tracker() {
     }
 }
 
-/// First run on this PC (no database yet): turn on "start at login" and start
-/// tracking, so a downloaded exe works on the first double-click. Skipped for
+/// First run on this PC (no database yet): start tracking, so a downloaded exe
+/// works on the first double-click, and remember to ask about starting at
+/// login (the app asks; it never turns that on by itself). Skipped for
 /// screenshots and for a database given with SCREENTIME_DB.
 fn first_run_setup() {
     if std::env::var_os("SCREENTIME_DB").is_some() || store::default_db_path().exists() {
         return;
     }
-    if win::get_startup().is_none() {
-        if let Some(cmd) = tracker_command() {
-            let _ = win::set_startup(&startup_line(&cmd));
-        }
+    // A settings file means the question was already answered (or never
+    // applied, for an install older than it), so it is asked once at most.
+    if win::get_startup().is_none() && !screentime_core::config::path().exists() {
+        let config = Config { ask_startup: true, ..Config::default() };
+        let _ = config.save();
     }
     if !win::tracker_running() {
         start_tracker();
@@ -174,7 +178,6 @@ fn first_run_setup() {
 
 impl App {
     fn boot() -> (Self, Task<Msg>) {
-        let config = Config::load();
         let capture = std::env::var_os("SCREENTIME_CAPTURE").map(|dir| {
             let scale = std::env::var("SCREENTIME_CAPTURE_SCALE").ok().and_then(|s| s.parse().ok()).unwrap_or(2.0);
             let mut steps = Vec::new();
@@ -188,6 +191,7 @@ impl App {
         if capture.is_none() {
             first_run_setup();
         }
+        let config = Config::load();
         let start_hidden = std::env::args().any(|a| a == "--tray");
         let mut app = App {
             window: None,
@@ -251,7 +255,7 @@ impl App {
     /// Motion only when Windows animation effects are on (the platform's
     /// reduced-motion setting), and never in scripted captures. Without it,
     /// the dial and the focus change appear in their final state at once.
-    fn motion(&self) -> bool {
+    pub fn motion(&self) -> bool {
         self.capture.is_none() && win_ui::animations_enabled()
     }
 
@@ -441,6 +445,19 @@ impl App {
                     self.export_note = Some(Err(format!("Could not change startup: {e}")));
                 }
                 self.startup_on = win::get_startup().is_some();
+                // Using the Settings switch answers the first-run question too.
+                if self.config.ask_startup {
+                    self.config.ask_startup = false;
+                    self.save_config();
+                }
+            }
+            Msg::AnswerStartup(yes) => {
+                if yes {
+                    // Also clears the question.
+                    return self.update(Msg::SetStartup(true));
+                }
+                self.config.ask_startup = false;
+                self.save_config();
             }
             Msg::SetPaused(p) => {
                 self.config.paused = p;
