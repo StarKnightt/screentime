@@ -36,11 +36,19 @@ PRAGMA user_version = 1;
 "#;
 
 /// Directory for all screentime files: `%LOCALAPPDATA%\screentime`.
+///
+/// The Store (MSIX) build uses its package's own LocalState folder instead,
+/// `%LOCALAPPDATA%\Packages\<family name>\LocalState`. Windows deletes that
+/// folder when the Store app is uninstalled, and it never shares data with a
+/// GitHub install on the same PC.
 pub fn data_dir() -> PathBuf {
     let base = std::env::var_os("LOCALAPPDATA")
         .map(PathBuf::from)
         .unwrap_or_else(std::env::temp_dir);
-    base.join("screentime")
+    match crate::win::package_family_name() {
+        Some(pfn) => base.join("Packages").join(pfn).join("LocalState"),
+        None => base.join("screentime"),
+    }
 }
 
 /// Database path. `SCREENTIME_DB` overrides it (tests, portable use).

@@ -20,6 +20,8 @@ chrono.workspace = true
 # it only repaints on input or every 30 s. Re-enable "wgpu" to compare again.
 iced = { version = "0.14", default-features = false, features = ["tiny-skia", "crisp", "thread-pool", "canvas", "image-without-codecs", "advanced"] }
 tray-icon = { version = "0.26", default-features = false }
+# Start at login for the Store (MSIX) build: the StartupTask API. The GitHub build uses the Run key.
+windows = { version = "0.62", features = ["ApplicationModel", "Foundation"] }
 
 [build-dependencies]
 embed-resource = "3"

@@ -1,0 +1,62 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Screentime for Windows: the Microsoft Store (MSIX) package. Built by store/build.ps1. -->
+<Package
+  xmlns="http://schemas.microsoft.com/appx/manifest/foundation/windows10"
+  xmlns:uap="http://schemas.microsoft.com/appx/manifest/uap/windows10"
+  xmlns:uap5="http://schemas.microsoft.com/appx/manifest/uap/windows10/5"
+  xmlns:rescap="http://schemas.microsoft.com/appx/manifest/foundation/windows10/restrictedcapabilities"
+  IgnorableNamespaces="uap uap5 rescap">
+
+  <!-- Values from Partner Center > Product identity. -->
+  <Identity
+    Name="prasenx.ScreentimeforWindows"
+    Publisher="CN=262CCA05-5330-4AD5-BF3F-792FF7DAC164"
+    Version="1.0.0.0"
+    ProcessorArchitecture="x64" />
+
+  <Properties>
+    <DisplayName>Screentime for Windows</DisplayName>
+    <PublisherDisplayName>prasenx</PublisherDisplayName>
+    <Logo>Assets\StoreLogo.png</Logo>
+    <Description>See where your day goes: a 24-hour dial of the apps you used, time per app, and the last seven days. Everything stays on your PC.</Description>
+  </Properties>
+
+  <!-- Tested on Windows 11 only, so Windows 11 is the minimum. -->
+  <Dependencies>
+    <TargetDeviceFamily Name="Windows.Desktop" MinVersion="10.0.22000.0" MaxVersionTested="10.0.26100.0" />
+  </Dependencies>
+
+  <Resources>
+    <Resource Language="en-us" />
+  </Resources>
+
+  <Applications>
+    <Application Id="Screentime" Executable="Screentime.exe" EntryPoint="Windows.FullTrustApplication">
+      <uap:VisualElements
+        DisplayName="Screentime"
+        Description="See where your day goes."
+        BackgroundColor="transparent"
+        Square150x150Logo="Assets\Square150x150Logo.png"
+        Square44x44Logo="Assets\Square44x44Logo.png">
+        <uap:DefaultTile
+          ShortName="Screentime"
+          Wide310x150Logo="Assets\Wide310x150Logo.png"
+          Square71x71Logo="Assets\SmallTile.png"
+          Square310x310Logo="Assets\LargeTile.png" />
+      </uap:VisualElements>
+      <Extensions>
+        <!-- Start at login: runs only the small tracker, never the window.
+             On by default; the user can turn it off in the app's Settings or in
+             Windows Settings > Apps > Startup. TaskId must match gui/src/startup.rs. -->
+        <uap5:Extension Category="windows.startupTask" Executable="screentime-tracker.exe" EntryPoint="Windows.FullTrustApplication">
+          <uap5:StartupTask TaskId="ScreentimeTracker" Enabled="true" DisplayName="Screentime" />
+        </uap5:Extension>
+      </Extensions>
+    </Application>
+  </Applications>
+
+  <!-- The only capability. No internetClient: Screentime never uses the network. -->
+  <Capabilities>
+    <rescap:Capability Name="runFullTrust" />
+  </Capabilities>
+</Package>

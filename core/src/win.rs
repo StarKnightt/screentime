@@ -6,7 +6,8 @@ use std::os::windows::ffi::{OsStrExt, OsStringExt};
 use std::ptr::{null, null_mut};
 
 use windows_sys::Win32::Foundation::{
-    CloseHandle, GetLastError, ERROR_ALREADY_EXISTS, HANDLE, HWND, LPARAM, RECT, WAIT_OBJECT_0,
+    CloseHandle, GetLastError, ERROR_ALREADY_EXISTS, ERROR_INSUFFICIENT_BUFFER, HANDLE, HWND, LPARAM, RECT,
+    WAIT_OBJECT_0,
 };
 use windows_sys::Win32::Graphics::Dwm::{DwmGetWindowAttribute, DWMWA_CLOAKED};
 use windows_sys::Win32::Graphics::Gdi::{
@@ -296,12 +297,42 @@ pub fn is_fullscreen(Window(hwnd): Window) -> bool {
     }
 }
 
+// ---------------------------------------------------------- packaging
+
+/// The package family name when running as an MSIX package (the Microsoft
+/// Store build), `None` for the plain exe from GitHub.
+pub fn package_family_name() -> Option<&'static str> {
+    use std::sync::OnceLock;
+    use windows_sys::Win32::Storage::Packaging::Appx::GetCurrentPackageFamilyName;
+    static PFN: OnceLock<Option<String>> = OnceLock::new();
+    PFN.get_or_init(|| unsafe {
+        let mut len = 0u32;
+        // APPMODEL_ERROR_NO_PACKAGE (15700) when not packaged.
+        if GetCurrentPackageFamilyName(&mut len, null_mut()) != ERROR_INSUFFICIENT_BUFFER {
+            return None;
+        }
+        let mut buf = vec![0u16; len as usize];
+        (GetCurrentPackageFamilyName(&mut len, buf.as_mut_ptr()) == 0).then(|| from_wide(&buf))
+    })
+    .as_deref()
+}
+
+/// Running as the Microsoft Store (MSIX) build.
+pub fn is_packaged() -> bool {
+    package_family_name().is_some()
+}
+
 // ---------------------------------------------------------- process control
 
 /// Named kernel objects shared by the tracker, the CLI and the GUI. `Local\`
 /// scopes them to this login session.
 pub mod names {
+    /// Shared by every build on purpose: whichever tracker holds it is the only
+    /// one counting, so having the GitHub and the Store build never double-counts.
     pub const TRACKER_INSTANCE: &str = r"Local\screentime.tracker.instance";
+    /// Held by the Store build's tracker next to the instance mutex, so a window
+    /// can tell which build's tracker is the running one.
+    pub const TRACKER_STORE: &str = r"Local\screentime.tracker.store";
     pub const TRACKER_STOP: &str = r"Local\screentime.tracker.stop";
     /// Set after changing config.ini so the tracker re-reads it at once.
     pub const TRACKER_RELOAD: &str = r"Local\screentime.tracker.reload";
@@ -345,6 +376,24 @@ pub fn tracker_running() -> bool {
     instance_running(names::TRACKER_INSTANCE)
 }
 
+/// Whether the running tracker (if any) is the Store build's.
+pub fn store_tracker_running() -> bool {
+    instance_running(names::TRACKER_STORE)
+}
+
+/// Whether the running tracker belongs to the other build (Store vs GitHub). Its
+/// data lives in that build's own folder, so this window shows none of it.
+pub fn other_build_tracking() -> bool {
+    tracker_running() && store_tracker_running() != is_packaged()
+}
+
+/// The stop and reload event names for this build. The Store build uses its own,
+/// so its window can never stop or reload the GitHub build's tracker (or the
+/// other way round).
+pub fn scoped(name: &str) -> String {
+    if is_packaged() { format!("{name}.store") } else { name.to_string() }
+}
+
 /// A named auto-reset event owned by the waiting side.
 pub struct NamedEvent(Handle);
 
@@ -382,12 +431,12 @@ pub fn signal(name: &str) -> bool {
 
 /// Ask a running tracker to flush and exit. False if none is listening.
 pub fn signal_stop() -> bool {
-    signal(names::TRACKER_STOP)
+    signal(&scoped(names::TRACKER_STOP))
 }
 
 /// Tell a running tracker that config.ini changed.
 pub fn signal_reload() -> bool {
-    signal(names::TRACKER_RELOAD)
+    signal(&scoped(names::TRACKER_RELOAD))
 }
 
 /// Stop child processes from inheriting this process's stdin/stdout/stderr.

@@ -96,7 +96,10 @@ pub struct App {
     pub config: Config,
     pub startup_on: bool,
     pub system_dark: bool,
+    /// Tracking in this build's own data (not the other build's tracker).
     pub tracker_running: bool,
+    /// The other build (GitHub vs Store) is the one tracking on this PC.
+    pub other_build: bool,
     pub snap: Snapshot,
     pub selected: Option<NaiveDate>,
     /// The app highlighted on today's dial, and the one before it (for the fade).
@@ -159,21 +162,51 @@ fn start_tracker() {
 
 /// First run on this PC (no database yet): start tracking, so a downloaded exe
 /// works on the first double-click, and remember to ask about starting at
-/// login (the app asks; it never turns that on by itself). Skipped for
-/// screenshots and for a database given with SCREENTIME_DB.
+/// login (the GitHub build asks; it never turns that on by itself). The Store
+/// build has start at login on by default, through its startup task, and the
+/// user can turn it off. Skipped for screenshots and for a database given with
+/// SCREENTIME_DB.
 fn first_run_setup() {
-    if std::env::var_os("SCREENTIME_DB").is_some() || store::default_db_path().exists() {
+    if std::env::var_os("SCREENTIME_DB").is_some() {
         return;
     }
-    // A settings file means the question was already answered (or never
-    // applied, for an install older than it), so it is asked once at most.
-    if win::get_startup().is_none() && !screentime_core::config::path().exists() {
+    let first = !store::default_db_path().exists();
+    // A settings file means this was already done (or never applied, for an
+    // install older than it), so it happens once at most.
+    let fresh_config = !screentime_core::config::path().exists();
+    if win::is_packaged() {
+        if fresh_config {
+            let _ = Config::default().save();
+            crate::startup::enable_by_default();
+        }
+    } else if first && fresh_config && win::get_startup().is_none() {
         let config = Config { ask_startup: true, ..Config::default() };
         let _ = config.save();
     }
-    if !win::tracker_running() {
+    if first && !win::tracker_running() {
         start_tracker();
     }
+}
+
+/// Whether this build starts at login (Store: its startup task; GitHub: the Run key).
+fn startup_on() -> bool {
+    if win::is_packaged() {
+        crate::startup::is_on()
+    } else {
+        win::get_startup().is_some()
+    }
+}
+
+fn set_startup(on: bool) -> Result<(), String> {
+    if win::is_packaged() {
+        return crate::startup::set(on);
+    }
+    match (on, tracker_command()) {
+        (true, Some(cmd)) => win::set_startup(&startup_line(&cmd)),
+        (true, None) => Err(std::io::Error::other("cannot find the app's own path")),
+        (false, _) => win::clear_startup(),
+    }
+    .map_err(|e| format!("Could not change startup: {e}"))
 }
 
 impl App {
@@ -196,9 +229,10 @@ impl App {
         let mut app = App {
             window: None,
             screen: Screen::Today,
-            startup_on: win::get_startup().is_some(),
+            startup_on: startup_on(),
             system_dark: win_ui::system_dark_mode(),
-            tracker_running: win::tracker_running(),
+            tracker_running: win::tracker_running() && !win::other_build_tracking(),
+            other_build: win::other_build_tracking(),
             snap: Snapshot::default(),
             selected: None,
             focus: None,
@@ -325,8 +359,9 @@ impl App {
 
     fn refresh(&mut self) {
         self.snap = self.source.load();
-        self.tracker_running = win::tracker_running();
-        self.startup_on = win::get_startup().is_some();
+        self.other_build = win::other_build_tracking();
+        self.tracker_running = win::tracker_running() && !self.other_build;
+        self.startup_on = startup_on();
         // Settings may have been changed from the CLI.
         let fresh = Config::load();
         if fresh != self.config {
@@ -436,15 +471,10 @@ impl App {
             Msg::Focus(name) => self.set_focus(name),
             Msg::Key(event) => return self.on_key(event),
             Msg::SetStartup(on) => {
-                let result = match (on, tracker_command()) {
-                    (true, Some(cmd)) => win::set_startup(&startup_line(&cmd)),
-                    (true, None) => Err(std::io::Error::other("cannot find the app's own path")),
-                    (false, _) => win::clear_startup(),
-                };
-                if let Err(e) = result {
-                    self.export_note = Some(Err(format!("Could not change startup: {e}")));
+                if let Err(e) = set_startup(on) {
+                    self.export_note = Some(Err(e));
                 }
-                self.startup_on = win::get_startup().is_some();
+                self.startup_on = startup_on();
                 // Using the Settings switch answers the first-run question too.
                 if self.config.ask_startup {
                     self.config.ask_startup = false;

@@ -106,6 +106,19 @@ struct IconEntry {
     hues: Vec<Hue>,
 }
 
+/// Today and now. For screenshots of a demo database only (`SCREENTIME_DB` set),
+/// `SCREENTIME_NOW=<unix seconds>` fixes the clock; the everyday app never reads it.
+fn clock() -> (NaiveDate, i64) {
+    let fixed = std::env::var_os("SCREENTIME_DB")
+        .and(std::env::var("SCREENTIME_NOW").ok())
+        .and_then(|v| v.parse::<i64>().ok())
+        .and_then(|t| chrono::DateTime::from_timestamp(t, 0));
+    match fixed {
+        Some(t) => (t.with_timezone(&chrono::Local).date_naive(), t.timestamp()),
+        None => (today(), now_ts()),
+    }
+}
+
 pub struct Source {
     store: Option<Store>,
     /// Filled lazily (also while drawing), hence the RefCell.
@@ -126,8 +139,7 @@ impl Source {
     }
 
     pub fn load(&mut self) -> Snapshot {
-        let today = today();
-        let now = now_ts();
+        let (today, now) = clock();
         let (t0, t1) = day_range(today);
         let mut snap = Snapshot { today, now_offset: now - t0, ..Default::default() };
         // Before the first data (a fresh install) the dial still spans the day.

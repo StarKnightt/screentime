@@ -228,8 +228,10 @@ pub fn run() -> Result<Exit, String> {
     let Some(_instance) = win::claim_single_instance() else {
         return Ok(Exit::AlreadyRunning);
     };
-    let stop = NamedEvent::create(win::names::TRACKER_STOP).ok_or("cannot create stop event")?;
-    let reload = NamedEvent::create(win::names::TRACKER_RELOAD).ok_or("cannot create reload event")?;
+    // The Store build marks its tracker so windows can tell the builds apart.
+    let _store_mark = win::is_packaged().then(|| win::claim_instance(win::names::TRACKER_STORE)).flatten();
+    let stop = NamedEvent::create(&win::scoped(win::names::TRACKER_STOP)).ok_or("cannot create stop event")?;
+    let reload = NamedEvent::create(&win::scoped(win::names::TRACKER_RELOAD)).ok_or("cannot create reload event")?;
     win::make_process_frugal();
 
     let path = store::default_db_path();

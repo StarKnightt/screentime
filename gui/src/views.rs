@@ -177,7 +177,15 @@ fn startup_prompt<'a>(c: Colors) -> El<'a> {
 }
 
 fn banner<'a>(app: &App, c: Colors) -> Option<El<'a>> {
-    let (msg, action, label) = if !app.tracker_running {
+    let (msg, action, label) = if app.other_build {
+        // Both builds on one PC: only one tracker may count, or every minute would count twice.
+        let msg = if screentime_core::win::is_packaged() {
+            "The GitHub version of Screentime is tracking on this PC, so this one is not, to avoid counting your time twice. To track here instead, choose Stop tracking and quit in its tray menu, then Try again."
+        } else {
+            "The Microsoft Store version of Screentime is tracking on this PC, so this one is not, to avoid counting your time twice. To track here instead, choose Stop tracking and quit in its tray menu, then Try again."
+        };
+        (msg, Msg::StartTracker, "Try again")
+    } else if !app.tracker_running {
         ("Screentime isn't recording right now.", Msg::StartTracker, "Start tracking")
     } else if app.config.paused {
         ("Tracking is paused. Nothing new is recorded.", Msg::SetPaused(false), "Resume")
@@ -286,7 +294,8 @@ fn today<'a>(app: &'a App, c: Colors) -> El<'a> {
                 .color(c.ink2),
         ]
         .spacing(6);
-        if !app.tracker_running {
+        // With the other build tracking, the banner above already explains and offers Try again.
+        if !app.tracker_running && !app.other_build {
             intro = intro.push(space().height(6)).push(
                 button(text("Start tracking").size(size::BODY).font(MEDIUM)).padding([8, 14]).style(style::outline(c)).on_press(Msg::StartTracker),
             );
@@ -460,7 +469,11 @@ fn settings<'a>(app: &'a App, c: Colors) -> El<'a> {
     data.push(
         column![
             text("Stored only on this PC").size(size::BODY).font(MEDIUM).color(c.ink),
-            caption(store::default_db_path().display().to_string(), c),
+            // A packaged path has no spaces, so let it break anywhere rather than run off the window.
+            text(store::default_db_path().display().to_string())
+                .size(size::CAPTION)
+                .color(c.ink3)
+                .wrapping(text::Wrapping::WordOrGlyph),
         ]
         .spacing(3)
         .into(),

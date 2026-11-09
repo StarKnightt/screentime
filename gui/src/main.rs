@@ -8,6 +8,7 @@ mod data;
 mod logo;
 mod palette;
 mod smooth;
+mod startup;
 mod style;
 mod tray;
 mod views;
@@ -16,8 +17,10 @@ use screentime_core::{win, win_ui};
 
 /// The single-instance names. A window opened on another database
 /// (`SCREENTIME_DB`: demos, tests) or in a test run (`SCREENTIME_TEST_ID`) is
-/// its own instance, so it never takes over or blocks the everyday app.
+/// its own instance, so it never takes over or blocks the everyday app. The
+/// Store build is its own instance too: it has its own data.
 pub fn instance_name(base: &str) -> String {
+    let base = &win::scoped(base);
     let db = std::env::var_os("SCREENTIME_DB").map(|d| d.to_string_lossy().to_lowercase());
     let test = std::env::var("SCREENTIME_TEST_ID").ok().filter(|t| !t.is_empty());
     if db.is_none() && test.is_none() {
