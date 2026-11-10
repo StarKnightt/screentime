@@ -16,6 +16,8 @@ One file, no installer, free. For 64-bit Windows 11 (see [Supported Windows vers
 
 ![Your day on a 24-hour dial](docs/images/day.jpg)
 
+<a href="https://buymeacoffee.com/prasenx"><img src="https://raw.githubusercontent.com/StarKnightt/StarKnightt/main/assets/support/bmc-button.png" alt="Buy me a coffee" height="40"></a>&nbsp;<a href="https://github.com/sponsors/StarKnightt"><img src="https://raw.githubusercontent.com/StarKnightt/StarKnightt/main/assets/support/github-sponsor.svg" alt="Sponsor on GitHub" height="40"></a>
+
 ## Install
 
 1. Download `Screentime.exe` and put it somewhere you will keep it, for example a folder in Documents.
@@ -143,5 +145,3 @@ Code layout:
 ## License
 
 MIT. See [LICENSE](LICENSE). The bundled Bricolage Grotesque font is under the SIL Open Font License (`gui/assets/fonts/OFL-Bricolage.txt`).
-
-<a href="https://buymeacoffee.com/prasenx"><img src="https://raw.githubusercontent.com/StarKnightt/StarKnightt/main/assets/support/bmc-button.png" alt="Buy me a coffee" height="40"></a>&nbsp;<a href="https://github.com/sponsors/StarKnightt"><img src="https://raw.githubusercontent.com/StarKnightt/StarKnightt/main/assets/support/github-sponsor.svg" alt="Sponsor on GitHub" height="40"></a>
