@@ -1,10 +1,16 @@
 # Screentime
 
-![Downloads](https://img.shields.io/github/downloads/StarKnightt/screentime/total)
+![GitHub downloads](https://img.shields.io/github/downloads/StarKnightt/screentime/total?label=github%20downloads)
 
 See where your day goes. A small, private screen time tracker for Windows, written in Rust.
 
-### [Download for Windows](https://github.com/StarKnightt/screentime/releases/latest/download/Screentime.exe)
+<a href="https://apps.microsoft.com/detail/9PBJ3RV1TPC5">
+	<img src="https://get.microsoft.com/images/en-us%20dark.svg" width="200" alt="Get it from Microsoft"/>
+</a>
+
+Installs from the Microsoft Store and updates on its own.
+
+### [Or download for Windows](https://github.com/StarKnightt/screentime/releases/latest/download/Screentime.exe)
 
 One file, no installer, free. For 64-bit Windows 11 (see [Supported Windows versions](#supported-windows-versions)).
 
