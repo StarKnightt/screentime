@@ -4,6 +4,13 @@
 
 See where your day goes. A small, private screen time tracker for Windows, written in Rust.
 
+<a href="https://peerlist.io/prasen/project/screentime-for-windows">
+	<picture>
+		<source media="(prefers-color-scheme: dark)" srcset="docs/images/peerlist/peerlist-badge-dark.svg">
+		<img src="docs/images/peerlist/peerlist-badge-light.svg" height="48" alt="Live on Peerlist Launchpad"/>
+	</picture>
+</a>
+
 <a href="https://apps.microsoft.com/detail/9PBJ3RV1TPC5">
 	<img src="https://get.microsoft.com/images/en-us%20dark.svg" width="200" alt="Get it from Microsoft"/>
 </a>
@@ -98,12 +105,6 @@ If you want to check the file first:
 ## Updates
 
 No auto-update, on purpose: Screentime never connects to the internet. Watch or star the repo to hear about new releases.
-
-## Roadmap
-
-- Microsoft Store release.
-
-Export of your data to CSV or JSON is already available in Settings.
 
 ## Feedback
 
